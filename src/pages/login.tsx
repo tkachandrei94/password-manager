@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
-import { Button, TextField, Container, Typography, Box, Link } from '@mui/material';
+import { Container, Box, Alert, Snackbar } from '@mui/material';
 import { useRouter } from 'next/router';
-import NextLink from 'next/link';
-import CustomTitle from 'components/CustomTitle';
-import CustomTextField from 'components/CustomTextField';
-import CustomButton from 'components/CustomButton';
-import CustomLink from 'components/CustomLink';
+import CustomTitle from '../components/CustomTitle';
+import CustomTextField from '../components/CustomTextField';
+import CustomButton from '../components/CustomButton';
+import CustomLink from '../components/CustomLink';
 
 export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
     const router = useRouter();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError('');
+        setLoading(true);
+
         try {
             const res = await fetch('/api/auth/login', {
                 method: 'POST',
@@ -21,16 +26,27 @@ export default function Login() {
                 body: JSON.stringify({ username, password }),
             });
 
+            const data = await res.json();
+
             if (res.ok) {
-                const { token } = await res.json();
-                localStorage.setItem('token', token); // Сохраняем токен
-                router.push('/passwords');
+                localStorage.setItem('token', data.token);
+                setOpenSnackbar(true);
+                setTimeout(() => {
+                    router.push('/passwords');
+                }, 1500);
             } else {
-                alert('Invalid credentials');
+                setError(data.message || 'Invalid username or password');
             }
         } catch (error) {
             console.error('Login error:', error);
+            setError('Network error. Please try again.');
+        } finally {
+            setLoading(false);
         }
+    };
+
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
     };
 
     return (
@@ -39,6 +55,13 @@ export default function Login() {
                 <CustomTitle>
                     Login
                 </CustomTitle>
+
+                {error && (
+                    <Alert severity="error" sx={{ mb: 2, borderRadius: '8px' }}>
+                        {error}
+                    </Alert>
+                )}
+
                 <form onSubmit={handleLogin}>
                     <CustomTextField
                         sx={{ mb: 3 }}
@@ -49,6 +72,7 @@ export default function Login() {
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
+                        disabled={loading}
                     />
 
                     <CustomTextField
@@ -60,22 +84,44 @@ export default function Login() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        disabled={loading}
                     />
 
                     <CustomButton
                         type="submit"
                         fullWidth
                         size="large"
+                        disabled={loading}
                     >
-                        Login
+                        {loading ? 'Logging in...' : 'Login'}
                     </CustomButton>
                 </form>
-                <Box sx={{ mt: 1, textAlign: 'center' }}>
+
+                <Box sx={{ mt: 2, textAlign: 'center' }}>
                     <CustomLink href="/register">
                         Don't have an account? Register
                     </CustomLink>
                 </Box>
             </Box>
+
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={2000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={handleCloseSnackbar}
+                    severity="success"
+                    sx={{
+                        width: '100%',
+                        fontFamily: 'var(--font-tomorrow)',
+                        borderRadius: '8px'
+                    }}
+                >
+                    Login successful! Redirecting...
+                </Alert>
+            </Snackbar>
         </Container>
     );
 }

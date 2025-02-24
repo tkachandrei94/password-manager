@@ -12,6 +12,8 @@ import CustomTitle from '../components/CustomTitle';
 import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 import Image from 'next/image';
+import PasswordGenerator from '../components/PasswordGenerator';
+
 interface Password {
     _id: string;
     title: string;
@@ -75,6 +77,10 @@ export default function Passwords() {
         router.push('/login');
     };
 
+    const handleGeneratedPassword = (password: string) => {
+        setNewPassword(password);
+    };
+
     return (
         <Container maxWidth="sm">
             <Box sx={{ mt: 4, mb: 4 }}>
@@ -97,20 +103,10 @@ export default function Passwords() {
                             value={newTitle}
                             onChange={(e) => setNewTitle(e.target.value)}
                             fullWidth
-                            margin="normal"
                             required
                             sx={{ mb: 2 }}
                         />
-                        <CustomTextField
-                            label="Password"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            fullWidth
-                            margin="normal"
-                            type="password"
-                            required
-                            sx={{ mb: 2 }}
-                        />
+                        <PasswordGenerator onPasswordGenerate={handleGeneratedPassword} />
                         <CustomButton
                             type="submit"
                             fullWidth
