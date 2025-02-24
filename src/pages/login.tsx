@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Button, TextField, Container, Typography, Box, Alert, Snackbar } from '@mui/material';
 import { useRouter } from 'next/router';
-import Link from "next/link"
+import NextLink from 'next/link';
 import CustomTitle from 'components/CustomTitle';
 import CustomTextField from 'components/CustomTextField';
 import CustomButton from 'components/CustomButton';
+import CustomLink from 'components/CustomLink';
 
 export default function Login() {
     const [username, setUsername] = useState('');
@@ -55,13 +56,6 @@ export default function Login() {
                 <CustomTitle>
                     Login
                 </CustomTitle>
-
-                {error && (
-                    <Alert severity="error" sx={{ mb: 2, borderRadius: '8px' }}>
-                        {error}
-                    </Alert>
-                )}
-
                 <form onSubmit={handleLogin}>
                     <CustomTextField
                         sx={{ mb: 3 }}
@@ -84,27 +78,20 @@ export default function Login() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        disabled={loading}
                     />
 
                     <CustomButton
                         type="submit"
                         fullWidth
                         size="large"
-                        disabled={loading}
                     >
-                        {loading ? 'Logging in...' : 'Login'}
+                        Login
                     </CustomButton>
                 </form>
-                <Box sx={{ mt: 2, textAlign: 'center' }}>
-                    <Button
-                        component={Link}
-                        href="/register"
-                        variant="text"
-                        color="primary"
-                    >
-                        Немає акаунту? Зареєструватися
-                    </Button>
+                <Box sx={{ mt: 1, textAlign: 'center' }}>
+                    <CustomLink href="/register">
+                        Don't have an account? Register
+                    </CustomLink>
                 </Box>
             </Box>
 
