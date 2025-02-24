@@ -1,35 +1,34 @@
 import React, { useState } from 'react';
-import { Button, TextField, Container, Typography, Box, Link } from '@mui/material';
+import { Container, Box } from '@mui/material';
 import { useRouter } from 'next/router';
-import NextLink from 'next/link';
 import CustomTitle from 'components/CustomTitle';
 import CustomTextField from 'components/CustomTextField';
 import CustomButton from 'components/CustomButton';
 import CustomLink from 'components/CustomLink';
 
-export default function Login() {
+export default function Register() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const router = useRouter();
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const res = await fetch('/api/auth/login', {
+            const res = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
             });
 
             if (res.ok) {
-                const { token } = await res.json();
-                localStorage.setItem('token', token); // Сохраняем токен
+                const data = await res.json();
+                localStorage.setItem('token', data.token);
                 router.push('/passwords');
             } else {
-                alert('Invalid credentials');
+                alert('Registration failed');
             }
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('Registration error:', error);
         }
     };
 
@@ -37,9 +36,9 @@ export default function Login() {
         <Container maxWidth="sm" sx={{ mt: 12 }}>
             <Box sx={{ mt: 4 }}>
                 <CustomTitle>
-                    Login
+                    Register
                 </CustomTitle>
-                <form onSubmit={handleLogin}>
+                <form onSubmit={handleRegister}>
                     <CustomTextField
                         sx={{ mb: 3 }}
                         label="Username"
@@ -67,15 +66,15 @@ export default function Login() {
                         fullWidth
                         size="large"
                     >
-                        Login
+                        Register
                     </CustomButton>
                 </form>
                 <Box sx={{ mt: 1, textAlign: 'center' }}>
-                    <CustomLink href="/register">
-                        Don't have an account? Register
+                    <CustomLink href="/login">
+                        Already have an account? Login
                     </CustomLink>
                 </Box>
             </Box>
         </Container>
     );
-}
+} 
