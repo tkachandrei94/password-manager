@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Container, Box, Alert, Snackbar } from '@mui/material';
+import { Button, TextField, Container, Typography, Box, Alert, Snackbar } from '@mui/material';
 import { useRouter } from 'next/router';
-import CustomTitle from '../components/CustomTitle';
-import CustomTextField from '../components/CustomTextField';
-import CustomButton from '../components/CustomButton';
-import CustomLink from '../components/CustomLink';
+import Link from "next/link"
+import CustomTitle from 'components/CustomTitle';
+import CustomTextField from 'components/CustomTextField';
+import CustomButton from 'components/CustomButton';
 
 export default function Login() {
     const [username, setUsername] = useState('');
@@ -96,11 +96,15 @@ export default function Login() {
                         {loading ? 'Logging in...' : 'Login'}
                     </CustomButton>
                 </form>
-
                 <Box sx={{ mt: 2, textAlign: 'center' }}>
-                    <CustomLink href="/register">
-                        Don't have an account? Register
-                    </CustomLink>
+                    <Button
+                        component={Link}
+                        href="/register"
+                        variant="text"
+                        color="primary"
+                    >
+                        Немає акаунту? Зареєструватися
+                    </Button>
                 </Box>
             </Box>
 

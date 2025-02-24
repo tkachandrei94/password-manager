@@ -5,15 +5,19 @@ import {
     List,
     ListItem,
     ListItemText,
-    Paper
+    Paper,
+    InputAdornment,
+    IconButton,
+    TextField,
+    Button
 } from '@mui/material';
 import { useRouter } from 'next/router';
-import CustomTitle from '../components/CustomTitle';
-import CustomTextField from '../components/CustomTextField';
-import CustomButton from '../components/CustomButton';
-import Image from 'next/image';
 import PasswordGenerator from '../components/PasswordGenerator';
-
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import CustomTitle from 'components/CustomTitle';
+import CustomButton from 'components/CustomButton';
+import CustomTextField from 'components/CustomTextField';
+import Image from 'next/image';
 interface Password {
     _id: string;
     title: string;
@@ -23,8 +27,12 @@ interface Password {
 export default function Passwords() {
     const router = useRouter();
     const [passwords, setPasswords] = useState<Password[]>([]);
-    const [newTitle, setNewTitle] = useState('');
-    const [newPassword, setNewPassword] = useState('');
+    const [newPassword, setNewPassword] = useState({
+        title: '',
+        password: ''
+    });
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [visiblePasswords, setVisiblePasswords] = useState<{ [key: string]: boolean }>({});
 
     useEffect(() => {
         fetchPasswords();
@@ -57,14 +65,13 @@ export default function Passwords() {
                 method: 'POST',
                 headers,
                 body: JSON.stringify({
-                    title: newTitle,
-                    password: newPassword,
+                    title: newPassword.title,
+                    password: newPassword.password,
                 }),
             });
 
             if (res.ok) {
-                setNewTitle('');
-                setNewPassword('');
+                setNewPassword({ title: '', password: '' });
                 fetchPasswords();
             }
         } catch (error) {
@@ -78,7 +85,17 @@ export default function Passwords() {
     };
 
     const handleGeneratedPassword = (password: string) => {
-        setNewPassword(password);
+        setNewPassword({
+            title: '',  // користувач має ввести назву
+            password: password
+        });
+    };
+
+    const togglePasswordVisibility = (passwordId: string) => {
+        setVisiblePasswords(prev => ({
+            ...prev,
+            [passwordId]: !prev[passwordId]
+        }));
     };
 
     return (
@@ -100,23 +117,49 @@ export default function Passwords() {
                     <form onSubmit={handleAddPassword}>
                         <CustomTextField
                             label="Title"
-                            value={newTitle}
-                            onChange={(e) => setNewTitle(e.target.value)}
+                            value={newPassword.title}
+                            onChange={(e) => setNewPassword({ ...newPassword, title: e.target.value })}
                             fullWidth
                             required
                             sx={{ mb: 2 }}
                         />
-                        <PasswordGenerator onPasswordGenerate={handleGeneratedPassword} />
+                        <TextField
+                            label="Password"
+                            value={newPassword.password}
+                            onChange={(e) => setNewPassword({ ...newPassword, password: e.target.value })}
+                            fullWidth
+                            margin="dense"
+                            size="small"
+                            type={showNewPassword ? "text" : "password"}
+                            required
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => setShowNewPassword(!showNewPassword)}
+                                            edge="end"
+                                        >
+                                            {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }}
+                        />
                         <CustomButton
                             type="submit"
-                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            size="small"
+                            sx={{ mt: 1 }}
                         >
                             Add Password
                         </CustomButton>
                     </form>
                 </Paper>
 
-                <List>
+                <PasswordGenerator onGenerate={handleGeneratedPassword} />
+
+                <List dense>
                     {passwords.map((pwd) => (
                         <ListItem
                             key={pwd._id}
@@ -130,23 +173,16 @@ export default function Passwords() {
                         >
                             <ListItemText
                                 primary={pwd.title}
-                                secondary={pwd.password}
-                                sx={{
-                                    '& .MuiListItemText-primary': {
-                                        fontFamily: 'var(--font-tomorrow)',
-                                        color: '#833D3B',
-                                        fontSize: '16px',
-                                        fontWeight: 600,
-                                        letterSpacing: '3.2px'
-                                    },
-                                    '& .MuiListItemText-secondary': {
-                                        fontFamily: 'var(--font-tomorrow)',
-                                        color: '#8F8483',
-                                        fontSize: '14px',
-                                        letterSpacing: '2.8px'
-                                    }
-                                }}
+                                secondary={visiblePasswords[pwd._id] ? pwd.password : '••••••••'}
+                                primaryTypographyProps={{ variant: 'body2' }}
+                                secondaryTypographyProps={{ variant: 'body2' }}
                             />
+                            <IconButton
+                                edge="end"
+                                onClick={() => togglePasswordVisibility(pwd._id)}
+                            >
+                                {visiblePasswords[pwd._id] ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
                         </ListItem>
                     ))}
                 </List>

@@ -1,182 +1,93 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
     Box,
-    Slider,
-    FormControlLabel,
+    Button,
     Checkbox,
+    FormControlLabel,
+    Slider,
+    TextField,
     Typography
 } from '@mui/material';
-import CustomTextField from './CustomTextField';
+import { generatePassword, PasswordOptions } from '../utils/passwordGenerator';
 
 interface PasswordGeneratorProps {
-    onPasswordGenerate: (password: string) => void;
+    onGenerate: (password: string) => void;
 }
 
-export default function PasswordGenerator({ onPasswordGenerate }: PasswordGeneratorProps) {
-    const [length, setLength] = useState(12);
-    const [includeUppercase, setIncludeUppercase] = useState(true);
-    const [includeLowercase, setIncludeLowercase] = useState(true);
-    const [includeNumbers, setIncludeNumbers] = useState(true);
-    const [includeSymbols, setIncludeSymbols] = useState(false);
-    const [generatedPassword, setGeneratedPassword] = useState('');
+export default function PasswordGenerator({ onGenerate }: PasswordGeneratorProps) {
+    const [options, setOptions] = useState<PasswordOptions>({
+        length: 12,
+        includeUppercase: true,
+        includeLowercase: true,
+        includeNumbers: true,
+        includeSymbols: false
+    });
 
-    const generatePassword = () => {
-        let charset = '';
-        let password = '';
-
-        if (includeLowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
-        if (includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        if (includeNumbers) charset += '0123456789';
-        if (includeSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
-
-        if (charset === '') {
-            setIncludeLowercase(true);
-            charset = 'abcdefghijklmnopqrstuvwxyz';
-        }
-
-        for (let i = 0; i < length; i++) {
-            const randomIndex = Math.floor(Math.random() * charset.length);
-            password += charset[randomIndex];
-        }
-
-        setGeneratedPassword(password);
-        onPasswordGenerate(password);
+    const handleGenerate = () => {
+        const password = generatePassword(options);
+        onGenerate(password);
     };
 
-    useEffect(() => {
-        generatePassword();
-    }, [length, includeUppercase, includeLowercase, includeNumbers, includeSymbols]);
-
     return (
-        <Box sx={{ mt: 2, mb: 2 }}>
-            <Typography
-                sx={{
-                    mb: 1,
-                    fontFamily: 'var(--font-tomorrow)',
-                    color: '#833D3B',
-                    letterSpacing: '2px'
-                }}
-            >
-                Password Length: {length}
-            </Typography>
+        <Box sx={{ p: 2 }}>
+            <Typography variant="h6">Генератор паролю</Typography>
 
-            <Slider
-                value={length}
-                onChange={(_, newValue) => setLength(newValue as number)}
-                min={8}
-                max={32}
-                sx={{
-                    color: '#833D3B',
-                    '& .MuiSlider-thumb': {
-                        backgroundColor: '#833D3B',
-                    },
-                    '& .MuiSlider-track': {
-                        backgroundColor: '#833D3B',
-                    },
-                    '& .MuiSlider-rail': {
-                        backgroundColor: '#BD787D',
-                    },
-                }}
-            />
-
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={includeUppercase}
-                            onChange={(e) => setIncludeUppercase(e.target.checked)}
-                            sx={{
-                                color: '#833D3B',
-                                '&.Mui-checked': {
-                                    color: '#833D3B',
-                                },
-                            }}
-                        />
-                    }
-                    label="Uppercase"
-                    sx={{
-                        '& .MuiFormControlLabel-label': {
-                            fontFamily: 'var(--font-tomorrow)',
-                            color: '#833D3B',
-                            letterSpacing: '2px'
-                        }
-                    }}
-                />
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={includeLowercase}
-                            onChange={(e) => setIncludeLowercase(e.target.checked)}
-                            sx={{
-                                color: '#833D3B',
-                                '&.Mui-checked': {
-                                    color: '#833D3B',
-                                },
-                            }}
-                        />
-                    }
-                    label="Lowercase"
-                    sx={{
-                        '& .MuiFormControlLabel-label': {
-                            fontFamily: 'var(--font-tomorrow)',
-                            color: '#833D3B',
-                            letterSpacing: '2px'
-                        }
-                    }}
-                />
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={includeNumbers}
-                            onChange={(e) => setIncludeNumbers(e.target.checked)}
-                            sx={{
-                                color: '#833D3B',
-                                '&.Mui-checked': {
-                                    color: '#833D3B',
-                                },
-                            }}
-                        />
-                    }
-                    label="Numbers"
-                    sx={{
-                        '& .MuiFormControlLabel-label': {
-                            fontFamily: 'var(--font-tomorrow)',
-                            color: '#833D3B',
-                            letterSpacing: '2px'
-                        }
-                    }}
-                />
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={includeSymbols}
-                            onChange={(e) => setIncludeSymbols(e.target.checked)}
-                            sx={{
-                                color: '#833D3B',
-                                '&.Mui-checked': {
-                                    color: '#833D3B',
-                                },
-                            }}
-                        />
-                    }
-                    label="Symbols"
-                    sx={{
-                        '& .MuiFormControlLabel-label': {
-                            fontFamily: 'var(--font-tomorrow)',
-                            color: '#833D3B',
-                            letterSpacing: '2px'
-                        }
-                    }}
+            <Box sx={{ my: 2 }}>
+                <Typography>Довжина: {options.length}</Typography>
+                <Slider
+                    value={options.length}
+                    min={8}
+                    max={32}
+                    onChange={(_, value) => setOptions({ ...options, length: value as number })}
                 />
             </Box>
 
-            <CustomTextField
-                fullWidth
-                value={generatedPassword}
-                InputProps={{
-                    readOnly: true,
-                }}
-            />
+            <Box sx={{ my: 2 }}>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={options.includeUppercase}
+                            onChange={(e) => setOptions({ ...options, includeUppercase: e.target.checked })}
+                        />
+                    }
+                    label="Великі літери"
+                />
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={options.includeLowercase}
+                            onChange={(e) => setOptions({ ...options, includeLowercase: e.target.checked })}
+                        />
+                    }
+                    label="Малі літери"
+                />
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={options.includeNumbers}
+                            onChange={(e) => setOptions({ ...options, includeNumbers: e.target.checked })}
+                        />
+                    }
+                    label="Цифри"
+                />
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={options.includeSymbols}
+                            onChange={(e) => setOptions({ ...options, includeSymbols: e.target.checked })}
+                        />
+                    }
+                    label="Спеціальні символи"
+                />
+            </Box>
+
+            <Button
+                variant="contained"
+                onClick={handleGenerate}
+                sx={{ mt: 2 }}
+            >
+                Згенерувати пароль
+            </Button>
         </Box>
     );
 } 

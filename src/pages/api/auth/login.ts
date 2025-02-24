@@ -23,9 +23,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const { username, password } = req.body;
-
+    console.log("username:", username);
+    console.log("password:", password);
     try {
         const user = await User.findOne({ username, password });
+        console.log("user:", user);
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
