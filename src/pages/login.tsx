@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button, TextField, Container, Typography, Box, Link } from '@mui/material';
+import { Button, TextField, Container, Typography, Box } from '@mui/material';
 import { useRouter } from 'next/router';
-import NextLink from 'next/link';
+import Link from "next/link"
 
 export default function Login() {
     const [username, setUsername] = useState('');
@@ -66,10 +66,15 @@ export default function Login() {
                         Login
                     </Button>
                 </form>
-                <Box sx={{ mt: 1, textAlign: 'center' }}>
-                    <Link component={NextLink} href="/register" variant="body2">
-                        Don't have an account? Register
-                    </Link>
+                <Box sx={{ mt: 2, textAlign: 'center' }}>
+                    <Button
+                        component={Link}
+                        href="/register"
+                        variant="text"
+                        color="primary"
+                    >
+                        Немає акаунту? Зареєструватися
+                    </Button>
                 </Box>
             </Box>
         </Container>
