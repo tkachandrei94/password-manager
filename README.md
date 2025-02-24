@@ -20,6 +20,7 @@ A secure password manager application built with Next.js, Material-UI, and Mongo
    - `JWT_SECRET`: A secret key for JWT authentication
 4. Start the development server
 
+
 contributors:
 - [@tkachandrei94](https://github.com/tkachandrei94)
 - [@JuliaKORNIEIEVA](https://github.com/JuliaKORNIEIEVA)
