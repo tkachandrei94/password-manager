@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Container,
-    Box,
-    List,
-    ListItem,
+import { 
+    Container, 
+    Typography, 
+    Button, 
+    TextField, 
+    List, 
+    ListItem, 
     ListItemText,
-    Paper
+    Box,
+    Paper,
+    InputAdornment,
+    IconButton
 } from '@mui/material';
 import { useRouter } from 'next/router';
-import CustomTitle from '../components/CustomTitle';
-import CustomTextField from '../components/CustomTextField';
-import CustomButton from '../components/CustomButton';
-import Image from 'next/image';
+import PasswordGenerator from '../components/PasswordGenerator';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+
 interface Password {
     _id: string;
     title: string;
@@ -21,8 +25,12 @@ interface Password {
 export default function Passwords() {
     const router = useRouter();
     const [passwords, setPasswords] = useState<Password[]>([]);
-    const [newTitle, setNewTitle] = useState('');
-    const [newPassword, setNewPassword] = useState('');
+    const [newPassword, setNewPassword] = useState({
+        title: '',
+        password: ''
+    });
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [visiblePasswords, setVisiblePasswords] = useState<{[key: string]: boolean}>({});
 
     useEffect(() => {
         fetchPasswords();
@@ -90,99 +98,90 @@ export default function Passwords() {
 
     return (
         <Container maxWidth="sm">
-            <Box sx={{ mt: 4, mb: 4 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                    <CustomTitle>
+            <Box sx={{ mt: 2, mb: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6" component="h1">
                         Password Manager
-                    </CustomTitle>
-                    <CustomButton
-                        onClick={handleLogout}
+                    </Typography>
+                    <Button 
+                        variant="outlined" 
+                        color="primary" 
                         size="small"
+                        onClick={handleLogout}
                     >
                         Logout
-                    </CustomButton>
+                    </Button>
                 </Box>
 
-                <Paper sx={{ p: 3, mb: 3, borderRadius: '16px' }}>
+                <Paper sx={{ p: 1.5, mb: 1.5 }}>
                     <form onSubmit={handleAddPassword}>
-                        <CustomTextField
+                        <TextField
                             label="Title"
                             value={newPassword.title}
                             onChange={(e) => setNewPassword({ ...newPassword, title: e.target.value })}
                             fullWidth
-                            margin="normal"
+                            margin="dense"
+                            size="small"
                             required
-                            sx={{ mb: 2 }}
                         />
-                        <CustomTextField
+                        <TextField
                             label="Password"
                             value={newPassword.password}
                             onChange={(e) => setNewPassword({ ...newPassword, password: e.target.value })}
                             fullWidth
-                            margin="normal"
-                            type="password"
+                            margin="dense"
+                            size="small"
+                            type={showNewPassword ? "text" : "password"}
                             required
-                            sx={{ mb: 2 }}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => setShowNewPassword(!showNewPassword)}
+                                            edge="end"
+                                        >
+                                            {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }}
                         />
-                        <CustomButton
-                            type="submit"
-                            fullWidth
+                        <Button 
+                            type="submit" 
+                            variant="contained" 
+                            color="primary"
+                            size="small"
+                            sx={{ mt: 1 }}
                         >
                             Add Password
-                        </CustomButton>
+                        </Button>
                     </form>
                 </Paper>
 
-                <List>
+                <PasswordGenerator onGenerate={handleGeneratedPassword} />
+
+                <List dense>
                     {passwords.map((pwd) => (
-                        <ListItem
+                        <ListItem 
                             key={pwd._id}
                             component={Paper}
-                            sx={{
-                                mb: 2,
-                                p: 2,
-                                borderRadius: '16px',
-                                backgroundColor: 'rgba(221, 209, 220, 0.10)'
-                            }}
+                            sx={{ mb: 0.5, p: 1 }}
                         >
                             <ListItemText
                                 primary={pwd.title}
-                                secondary={pwd.password}
-                                sx={{
-                                    '& .MuiListItemText-primary': {
-                                        fontFamily: 'var(--font-tomorrow)',
-                                        color: '#833D3B',
-                                        fontSize: '16px',
-                                        fontWeight: 600,
-                                        letterSpacing: '3.2px'
-                                    },
-                                    '& .MuiListItemText-secondary': {
-                                        fontFamily: 'var(--font-tomorrow)',
-                                        color: '#8F8483',
-                                        fontSize: '14px',
-                                        letterSpacing: '2.8px'
-                                    }
-                                }}
+                                secondary={visiblePasswords[pwd._id] ? pwd.password : '••••••••'}
+                                primaryTypographyProps={{ variant: 'body2' }}
+                                secondaryTypographyProps={{ variant: 'body2' }}
                             />
+                            <IconButton 
+                                edge="end" 
+                                onClick={() => togglePasswordVisibility(pwd._id)}
+                            >
+                                {visiblePasswords[pwd._id] ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
                         </ListItem>
                     ))}
                 </List>
-            </Box>
-
-            <Box
-                sx={{
-                    position: 'fixed',
-                    bottom: 0,
-                    right: 44,
-                    zIndex: -1
-                }}
-            >
-                <Image
-                    src="/images/image.png"
-                    alt="Decorative image"
-                    width={706}
-                    height={348}
-                />
             </Box>
         </Container>
     );
