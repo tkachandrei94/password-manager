@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Button, TextField, Container, Typography, Box } from '@mui/material';
 import { useRouter } from 'next/router';
-import Link from "next/link"
+import NextLink from 'next/link';
+import CustomTitle from 'components/CustomTitle';
+import CustomTextField from 'components/CustomTextField';
+import CustomButton from 'components/CustomButton';
+import CustomLink from 'components/CustomLink';
 
 export default function Login() {
     const [username, setUsername] = useState('');
@@ -30,51 +34,46 @@ export default function Login() {
     };
 
     return (
-        <Container maxWidth="xs">
+        <Container maxWidth="sm" sx={{ mt: 12 }}>
             <Box sx={{ mt: 4 }}>
-                <Typography variant="h6" component="h1" gutterBottom>
+                <CustomTitle>
                     Login
-                </Typography>
+                </CustomTitle>
                 <form onSubmit={handleLogin}>
-                    <TextField
+                    <CustomTextField
+                        sx={{ mb: 3 }}
                         label="Username"
+                        variant="outlined"
+                        fullWidth
+                        size="medium"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        fullWidth
-                        margin="dense"
-                        size="small"
                         required
                     />
-                    <TextField
+
+                    <CustomTextField
+                        sx={{ mb: 3 }}
                         label="Password"
                         type="password"
+                        fullWidth
+                        size="medium"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        fullWidth
-                        margin="dense"
-                        size="small"
                         required
                     />
-                    <Button 
-                        type="submit" 
-                        variant="contained" 
-                        color="primary"
+
+                    <CustomButton
+                        type="submit"
                         fullWidth
-                        size="small"
-                        sx={{ mt: 1 }}
+                        size="large"
                     >
                         Login
-                    </Button>
+                    </CustomButton>
                 </form>
-                <Box sx={{ mt: 2, textAlign: 'center' }}>
-                    <Button
-                        component={Link}
-                        href="/register"
-                        variant="text"
-                        color="primary"
-                    >
-                        Немає акаунту? Зареєструватися
-                    </Button>
+                <Box sx={{ mt: 1, textAlign: 'center' }}>
+                    <CustomLink href="/register">
+                        Don't have an account? Register
+                    </CustomLink>
                 </Box>
             </Box>
         </Container>
