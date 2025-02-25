@@ -1,30 +1,31 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { Container, Box } from '@mui/material';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { Container, TextField, Button, Box, Typography } from '@mui/material';
+import CustomTitle from 'components/CustomTitle';
+import CustomTextField from 'components/CustomTextField';
+import CustomButton from 'components/CustomButton';
+import CustomLink from 'components/CustomLink';
 
 export default function Register() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    username: '',
-    password: ''
-  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
       });
 
       if (res.ok) {
         const data = await res.json();
         localStorage.setItem('token', data.token);
         router.push('/passwords');
+      } else {
+        alert('Registration failed');
       }
     } catch (error) {
       console.error('Registration error:', error);
@@ -32,42 +33,46 @@ export default function Register() {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Typography component="h1" variant="h5">
-          Реєстрація
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
-            required
+    <Container maxWidth="sm" sx={{ mt: 12 }}>
+      <Box sx={{ mt: 4 }}>
+        <CustomTitle>
+          Register
+        </CustomTitle>
+        <form onSubmit={handleRegister}>
+          <CustomTextField
+            sx={{ mb: 3 }}
+            label="Username"
+            variant="outlined"
             fullWidth
-            label="Ім'я користувача"
-            value={formData.username}
-            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            size="medium"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
           />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Пароль"
+
+          <CustomTextField
+            sx={{ mb: 3 }}
+            label="Password"
             type="password"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            fullWidth
+            size="medium"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
           />
-          <Button
+
+          <CustomButton
             type="submit"
             fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
+            size="large"
           >
-            Зареєструватися
-          </Button>
-          <Link href="/login" passHref>
-            <Button fullWidth variant="text">
-              Вже є акаунт? Увійти
-            </Button>
-          </Link>
+            Register
+          </CustomButton>
+        </form>
+        <Box sx={{ mt: 1, textAlign: 'center' }}>
+          <CustomLink href="/login">
+            Already have an account? Login
+          </CustomLink>
         </Box>
       </Box>
     </Container>
