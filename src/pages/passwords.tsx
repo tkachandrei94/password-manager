@@ -131,10 +131,13 @@ export default function Passwords() {
                 body: JSON.stringify({
                     title: newPassword.title,
                     password: newPassword.password,
+                    title: newPassword.title,
+                    password: newPassword.password,
                 }),
             });
 
             if (res.ok) {
+                setNewPassword({ title: '', password: '' });
                 setNewPassword({ title: '', password: '' });
                 fetchPasswords();
             }
