@@ -7,7 +7,7 @@ declare global {
 }
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://mongo_pass-manager:27017/praktika';
 
 if (!MONGODB_URI) {
     throw new Error('Please define MONGODB_URI environment variable');
@@ -22,28 +22,26 @@ if (!cached) {
 }
 
 async function dbConnect() {
-    if (cached.conn) {
-        return cached.conn;
-    }
-
-    if (!cached.promise) {
-        const opts = {
-            bufferCommands: false,
-        };
-
-        cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-            return mongoose;
-        });
-    }
-
+    console.log('Attempting to connect to MongoDB...');
+    
     try {
-        cached.conn = await cached.promise;
-    } catch (e) {
-        cached.promise = null;
-        throw e;
+        // Перевірка існуючого підключення
+        if (mongoose.connections[0].readyState) {
+            console.log('Using existing MongoDB connection');
+            return mongoose.connections[0];
+        }
+        
+        console.log(`Connecting to MongoDB...`);
+        
+        // Підключення до бази даних
+        await mongoose.connect(MONGODB_URI);
+        
+        console.log('Successfully connected to MongoDB');
+        return mongoose.connections[0];
+    } catch (error: any) {
+        console.error('MongoDB connection error:', error);
+        throw new Error(`Failed to connect to database: ${error.message}`);
     }
-
-    return cached.conn;
 }
 
 const UserSchema = new mongoose.Schema({

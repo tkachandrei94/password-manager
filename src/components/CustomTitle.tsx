@@ -7,7 +7,6 @@ const CustomTitle = styled(Typography)({
   fontWeight: 700,
   lineHeight: '40px',
   letterSpacing: '8px',
-  marginBottom: '48px',
 });
 
 export default CustomTitle; 
