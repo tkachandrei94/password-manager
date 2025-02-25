@@ -55,14 +55,13 @@ export default function Passwords() {
                 method: 'POST',
                 headers,
                 body: JSON.stringify({
-                    title: newTitle,
-                    password: newPassword,
+                    title: newPassword.title,
+                    password: newPassword.password,
                 }),
             });
 
             if (res.ok) {
-                setNewTitle('');
-                setNewPassword('');
+                setNewPassword({ title: '', password: '' });
                 fetchPasswords();
             }
         } catch (error) {
@@ -73,6 +72,20 @@ export default function Passwords() {
     const handleLogout = () => {
         localStorage.removeItem('token');
         router.push('/login');
+    };
+
+    const handleGeneratedPassword = (password: string) => {
+        setNewPassword({
+            title: '',  // користувач має ввести назву
+            password: password
+        });
+    };
+
+    const togglePasswordVisibility = (passwordId: string) => {
+        setVisiblePasswords(prev => ({
+            ...prev,
+            [passwordId]: !prev[passwordId]
+        }));
     };
 
     return (
@@ -94,8 +107,8 @@ export default function Passwords() {
                     <form onSubmit={handleAddPassword}>
                         <CustomTextField
                             label="Title"
-                            value={newTitle}
-                            onChange={(e) => setNewTitle(e.target.value)}
+                            value={newPassword.title}
+                            onChange={(e) => setNewPassword({ ...newPassword, title: e.target.value })}
                             fullWidth
                             margin="normal"
                             required
@@ -103,8 +116,8 @@ export default function Passwords() {
                         />
                         <CustomTextField
                             label="Password"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
+                            value={newPassword.password}
+                            onChange={(e) => setNewPassword({ ...newPassword, password: e.target.value })}
                             fullWidth
                             margin="normal"
                             type="password"
