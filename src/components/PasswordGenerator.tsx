@@ -1,93 +1,166 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     Box,
-    Button,
-    Checkbox,
-    FormControlLabel,
     Slider,
-    TextField,
-    Typography
+    Typography,
+    FormControlLabel,
+    Checkbox,
+    Paper
 } from '@mui/material';
-import { generatePassword, PasswordOptions } from '../utils/passwordGenerator';
+import CustomButton from './CustomButton';
 
 interface PasswordGeneratorProps {
-    onGenerate: (password: string) => void;
+    passwordLength: number;
+    setPasswordLength: (length: number) => void;
+    includeLowercase: boolean;
+    setIncludeLowercase: (include: boolean) => void;
+    includeUppercase: boolean;
+    setIncludeUppercase: (include: boolean) => void;
+    includeNumbers: boolean;
+    setIncludeNumbers: (include: boolean) => void;
+    includeSymbols: boolean;
+    setIncludeSymbols: (include: boolean) => void;
 }
 
-export default function PasswordGenerator({ onGenerate }: PasswordGeneratorProps) {
-    const [options, setOptions] = useState<PasswordOptions>({
-        length: 12,
-        includeUppercase: true,
-        includeLowercase: true,
-        includeNumbers: true,
-        includeSymbols: false
-    });
-
-    const handleGenerate = () => {
-        const password = generatePassword(options);
-        onGenerate(password);
-    };
-
+const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
+    passwordLength,
+    setPasswordLength,
+    includeLowercase,
+    setIncludeLowercase,
+    includeUppercase,
+    setIncludeUppercase,
+    includeNumbers,
+    setIncludeNumbers,
+    includeSymbols,
+    setIncludeSymbols,
+}) => {
     return (
-        <Box sx={{ p: 2 }}>
-            <Typography variant="h6">Генератор паролю</Typography>
-
-            <Box sx={{ my: 2 }}>
-                <Typography>Довжина: {options.length}</Typography>
-                <Slider
-                    value={options.length}
-                    min={8}
-                    max={32}
-                    onChange={(_, value) => setOptions({ ...options, length: value as number })}
-                />
+        <div>
+            <Box sx={{ mb: 3 }}>
+                <Box sx={{ px: 1 }}>
+                    <Slider
+                        value={passwordLength}
+                        onChange={(_, value) => setPasswordLength(value as number)}
+                        min={6}
+                        max={32}
+                        valueLabelDisplay="on"
+                        valueLabelFormat={(value) => `${value}`}
+                        sx={{
+                            color: '#BD787D',
+                            '& .MuiSlider-thumb': {
+                                '&:hover, &.Mui-focusVisible': {
+                                    boxShadow: '0px 0px 0px 8px rgba(189, 120, 125, 0.16)',
+                                },
+                            },
+                            '& .MuiSlider-valueLabel': {
+                                backgroundColor: '#BD787D',
+                                fontFamily: 'var(--font-tomorrow)',
+                                fontSize: '14px',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                            },
+                        }}
+                    />
+                </Box>
             </Box>
 
-            <Box sx={{ my: 2 }}>
+            <Box sx={{ mb: 3 }}>
+                <Typography
+                    sx={{
+                        mb: 1,
+                        fontFamily: 'var(--font-tomorrow)',
+                        color: '#833D3B'
+                    }}
+                >
+                    Include:
+                </Typography>
                 <FormControlLabel
                     control={
                         <Checkbox
-                            checked={options.includeUppercase}
-                            onChange={(e) => setOptions({ ...options, includeUppercase: e.target.checked })}
+                            checked={includeLowercase}
+                            onChange={(e) => setIncludeLowercase(e.target.checked)}
+                            sx={{
+                                color: '#BD787D',
+                                '&.Mui-checked': {
+                                    color: '#BD787D',
+                                },
+                            }}
                         />
                     }
-                    label="Великі літери"
+                    label="Lowercase letters (a-z)"
+                    sx={{
+                        '& .MuiFormControlLabel-label': {
+                            fontFamily: 'var(--font-tomorrow)',
+                            color: '#833D3B'
+                        }
+                    }}
                 />
                 <FormControlLabel
                     control={
                         <Checkbox
-                            checked={options.includeLowercase}
-                            onChange={(e) => setOptions({ ...options, includeLowercase: e.target.checked })}
+                            checked={includeUppercase}
+                            onChange={(e) => setIncludeUppercase(e.target.checked)}
+                            sx={{
+                                color: '#BD787D',
+                                '&.Mui-checked': {
+                                    color: '#BD787D',
+                                },
+                            }}
                         />
                     }
-                    label="Малі літери"
+                    label="Uppercase letters (A-Z)"
+                    sx={{
+                        '& .MuiFormControlLabel-label': {
+                            fontFamily: 'var(--font-tomorrow)',
+                            color: '#833D3B'
+                        }
+                    }}
                 />
                 <FormControlLabel
                     control={
                         <Checkbox
-                            checked={options.includeNumbers}
-                            onChange={(e) => setOptions({ ...options, includeNumbers: e.target.checked })}
+                            checked={includeNumbers}
+                            onChange={(e) => setIncludeNumbers(e.target.checked)}
+                            sx={{
+                                color: '#BD787D',
+                                '&.Mui-checked': {
+                                    color: '#BD787D',
+                                },
+                            }}
                         />
                     }
-                    label="Цифри"
+                    label="Numbers (0-9)"
+                    sx={{
+                        '& .MuiFormControlLabel-label': {
+                            fontFamily: 'var(--font-tomorrow)',
+                            color: '#833D3B'
+                        }
+                    }}
                 />
                 <FormControlLabel
                     control={
                         <Checkbox
-                            checked={options.includeSymbols}
-                            onChange={(e) => setOptions({ ...options, includeSymbols: e.target.checked })}
+                            checked={includeSymbols}
+                            onChange={(e) => setIncludeSymbols(e.target.checked)}
+                            sx={{
+                                color: '#BD787D',
+                                '&.Mui-checked': {
+                                    color: '#BD787D',
+                                },
+                            }}
                         />
                     }
-                    label="Спеціальні символи"
+                    label="Symbols (!@#$%^&*)"
+                    sx={{
+                        '& .MuiFormControlLabel-label': {
+                            fontFamily: 'var(--font-tomorrow)',
+                            color: '#833D3B'
+                        }
+                    }}
                 />
             </Box>
-
-            <Button
-                variant="contained"
-                onClick={handleGenerate}
-                sx={{ mt: 2 }}
-            >
-                Згенерувати пароль
-            </Button>
-        </Box>
+        </div>
     );
-} 
+};
+
+export default PasswordGenerator; 

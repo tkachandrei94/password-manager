@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Button, TextField, Container, Typography, Box, Alert, Snackbar } from '@mui/material';
+import { Container, Box, Alert, Snackbar } from '@mui/material';
 import { useRouter } from 'next/router';
-import NextLink from 'next/link';
-import CustomTitle from 'components/CustomTitle';
-import CustomTextField from 'components/CustomTextField';
-import CustomButton from 'components/CustomButton';
-import CustomLink from 'components/CustomLink';
+import CustomTitle from '../components/CustomTitle';
+import CustomTextField from '../components/CustomTextField';
+import PasswordField from '../components/PasswordField';
+import CustomButton from '../components/CustomButton';
+import CustomLink from '../components/CustomLink';
 
 export default function Login() {
     const [username, setUsername] = useState('');
@@ -51,45 +51,52 @@ export default function Login() {
     };
 
     return (
-        <Container maxWidth="sm" sx={{ mt: 12 }}>
-            <Box sx={{ mt: 4 }}>
+        <Container maxWidth="sm">
+            <Box sx={{ mt: 8, mb: 4 }}>
                 <CustomTitle>
                     Login
                 </CustomTitle>
-                <form onSubmit={handleLogin}>
+
+                {error && (
+                    <Alert
+                        severity="error"
+                        sx={{ mb: 2, borderRadius: '8px' }}
+                        onClose={() => setError('')}
+                    >
+                        {error}
+                    </Alert>
+                )}
+
+                <Box component="form" onSubmit={handleLogin} sx={{ mt: 4 }}>
                     <CustomTextField
-                        sx={{ mb: 3 }}
                         label="Username"
-                        variant="outlined"
-                        fullWidth
-                        size="medium"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                        fullWidth
                         required
+                        sx={{ mb: 2 }}
                         disabled={loading}
                     />
 
-                    <CustomTextField
-                        sx={{ mb: 3 }}
+                    <PasswordField
                         label="Password"
-                        type="password"
-                        fullWidth
-                        size="medium"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        fullWidth
                         required
+                        sx={{ mb: 4 }}
+                        disabled={loading}
                     />
 
                     <CustomButton
                         type="submit"
                         fullWidth
-                        size="large"
+                        disabled={loading}
                     >
-                        Login
+                        {loading ? 'Logging in...' : 'Login'}
                     </CustomButton>
-                </form>
-                <Box sx={{ mt: 1, textAlign: 'center' }}>
-                    <CustomLink href="/register">
+
+                    <CustomLink href="/register" sx={{ mt: 2, display: 'block', textAlign: 'center' }}>
                         Don't have an account? Register
                     </CustomLink>
                 </Box>

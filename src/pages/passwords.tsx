@@ -2,35 +2,35 @@ import React, { useState, useEffect } from 'react';
 import {
     Container,
     Box,
-    List,
-    ListItem,
-    ListItemText,
-    Paper,
-    IconButton
+    Grid,
+    Typography
 } from '@mui/material';
 import { useRouter } from 'next/router';
 import CustomTitle from '../components/CustomTitle';
-import CustomTextField from '../components/CustomTextField';
 import CustomButton from '../components/CustomButton';
 import Image from 'next/image';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-interface Password {
-    _id: string;
-    title: string;
-    password: string;
-}
+import PasswordGenerator from '../components/PasswordGenerator';
+import PasswordList from '../components/PasswordList';
+import AddPasswordForm from '../components/AddPasswordForm';
+import { generatePassword } from '../utils/passwordUtils';
+import { Password, NewPassword } from '../types';
 
 export default function Passwords() {
     const router = useRouter();
     const [passwords, setPasswords] = useState<Password[]>([]);
-    const [newPassword, setNewPassword] = useState({
+    const [newPassword, setNewPassword] = useState<NewPassword>({
         title: '',
         password: ''
     });
-    const [showNewPassword, setShowNewPassword] = useState(false);
     const [visiblePasswords, setVisiblePasswords] = useState<{ [key: string]: boolean }>({});
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [showPassword, setShowPassword] = useState(false);
+
+    // Стан для генератора паролів
+    const [passwordLength, setPasswordLength] = useState(12);
+    const [includeUppercase, setIncludeUppercase] = useState(true);
+    const [includeLowercase, setIncludeLowercase] = useState(false);
+    const [includeNumbers, setIncludeNumbers] = useState(false);
+    const [includeSymbols, setIncludeSymbols] = useState(false);
 
     useEffect(() => {
         // Перевірка авторизації при завантаженні сторінки
@@ -59,19 +59,23 @@ export default function Passwords() {
 
                 // Токен валідний, завантажуємо паролі
                 fetchPasswords();
+                // Генеруємо початковий пароль
+                handleGeneratePassword();
             } catch (error) {
                 console.error('Auth check error:', error);
-                setError('Authentication error');
-                setIsLoading(false);
             }
         };
 
         checkAuth();
     }, []);
 
+    // Ефект для генерації нового пароля при зміні параметрів
+    useEffect(() => {
+        handleGeneratePassword();
+    }, [passwordLength, includeUppercase, includeLowercase, includeNumbers, includeSymbols]);
+
     const fetchPasswords = async () => {
-        setIsLoading(true);
-        setError('');
+        (true);
 
         try {
             const token = localStorage.getItem('token');
@@ -104,14 +108,13 @@ export default function Passwords() {
             } else {
                 console.error('Unexpected response format:', data);
                 setPasswords([]);
-                setError('Unexpected data format received');
+                ('Unexpected data format received');
             }
         } catch (error) {
             console.error('Error fetching passwords:', error);
-            setError(error instanceof Error ? error.message : 'Failed to load passwords');
+            (error instanceof Error ? error.message : 'Failed to load passwords');
             setPasswords([]);
         } finally {
-            setIsLoading(false);
         }
     };
 
@@ -145,13 +148,6 @@ export default function Passwords() {
         router.push('/login');
     };
 
-    const handleGeneratedPassword = (password: string) => {
-        setNewPassword({
-            title: '',  // користувач має ввести назву
-            password: password
-        });
-    };
-
     const togglePasswordVisibility = (passwordId: string) => {
         setVisiblePasswords(prev => ({
             ...prev,
@@ -159,8 +155,42 @@ export default function Passwords() {
         }));
     };
 
+    // Функція генерації пароля
+    const handleGeneratePassword = () => {
+        const password = generatePassword(
+            passwordLength,
+            includeLowercase,
+            includeUppercase,
+            includeNumbers,
+            includeSymbols
+        );
+
+        setNewPassword(prev => ({
+            ...prev,
+            password
+        }));
+    };
+
+    const handleTogglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNewPassword({
+            ...newPassword,
+            title: e.target.value
+        });
+    };
+
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNewPassword({
+            ...newPassword,
+            password: e.target.value
+        });
+    };
+
     return (
-        <Container maxWidth="sm">
+        <Container maxWidth="lg">
             <Box sx={{ mt: 4, mb: 4 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
                     <CustomTitle>
@@ -174,80 +204,70 @@ export default function Passwords() {
                     </CustomButton>
                 </Box>
 
-                <Paper sx={{ p: 3, mb: 3, borderRadius: '16px' }}>
-                    <form onSubmit={handleAddPassword}>
-                        <CustomTextField
-                            label="Title"
-                            value={newPassword.title}
-                            onChange={(e) => setNewPassword({ ...newPassword, title: e.target.value })}
-                            fullWidth
-                            margin="normal"
-                            required
-                            sx={{ mb: 2 }}
-                        />
-                        <CustomTextField
-                            label="Password"
-                            value={newPassword.password}
-                            onChange={(e) => setNewPassword({ ...newPassword, password: e.target.value })}
-                            fullWidth
-                            margin="normal"
-                            type="password"
-                            required
-                            sx={{ mb: 2 }}
-                        />
-                        <CustomButton
-                            type="submit"
-                            fullWidth
-                        >
-                            Add Password
-                        </CustomButton>
-                    </form>
-                </Paper>
-
-                <List>
-                    {Array.isArray(passwords) ? passwords.map((pwd) => (
-                        <ListItem
-                            key={pwd._id}
-                            component={Paper}
-                            sx={{
-                                mb: 2,
-                                p: 2,
-                                borderRadius: '16px',
-                                backgroundColor: 'rgba(221, 209, 220, 0.10)'
-                            }}
-                        >
-                            <ListItemText
-                                primary={pwd.title}
-                                secondary={pwd.password}
-                                sx={{
-                                    '& .MuiListItemText-primary': {
-                                        fontFamily: 'var(--font-tomorrow)',
-                                        color: '#833D3B',
-                                        fontSize: '16px',
-                                        fontWeight: 600,
-                                        letterSpacing: '3.2px'
-                                    },
-                                    '& .MuiListItemText-secondary': {
-                                        fontFamily: 'var(--font-tomorrow)',
-                                        color: '#8F8483',
-                                        fontSize: '14px',
-                                        letterSpacing: '2.8px'
-                                    }
-                                }}
+                <Grid container spacing={6}>
+                    {/* Ліва колонка - форма додавання пароля та список паролів */}
+                    <Grid item xs={12} md={6}>
+                        <Box sx={{
+                            backgroundColor: 'rgba(221, 209, 220, 0.05)',
+                            p: 3,
+                            borderRadius: '16px',
+                            height: '100%'
+                        }}>
+                            <AddPasswordForm
+                                title={newPassword.title}
+                                password={newPassword.password}
+                                showPassword={showPassword}
+                                onTitleChange={handleTitleChange}
+                                onPasswordChange={handlePasswordChange}
+                                onTogglePasswordVisibility={handleTogglePasswordVisibility}
+                                onGeneratePassword={handleGeneratePassword}
+                                onSubmit={handleAddPassword}
                             />
-                            <IconButton
-                                edge="end"
-                                onClick={() => togglePasswordVisibility(pwd._id)}
+
+                            <PasswordList
+                                passwords={passwords}
+                                visiblePasswords={visiblePasswords}
+                                togglePasswordVisibility={togglePasswordVisibility}
+                            />
+                        </Box>
+                    </Grid>
+
+                    {/* Права колонка - генератор паролів */}
+                    <Grid item xs={12} md={6}>
+                        <Box sx={{
+                            backgroundColor: 'rgba(221, 209, 220, 0.05)',
+                            p: 3,
+                            borderRadius: '16px',
+                            height: '100%'
+                        }}>
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    mb: 3,
+                                    fontFamily: 'var(--font-tomorrow)',
+                                    color: '#833D3B',
+                                    letterSpacing: '2px',
+                                    fontWeight: 600
+                                }}
                             >
-                                {visiblePasswords[pwd._id] ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                        </ListItem>
-                    )) : (
-                        <ListItem component={Paper}>
-                            <ListItemText primary="No passwords found" />
-                        </ListItem>
-                    )}
-                </List>
+                                Password Generator
+                            </Typography>
+
+                            <PasswordGenerator
+                                passwordLength={passwordLength}
+                                setPasswordLength={setPasswordLength}
+                                includeLowercase={includeLowercase}
+                                setIncludeLowercase={setIncludeLowercase}
+                                includeUppercase={includeUppercase}
+                                setIncludeUppercase={setIncludeUppercase}
+                                includeNumbers={includeNumbers}
+                                setIncludeNumbers={setIncludeNumbers}
+                                includeSymbols={includeSymbols}
+                                setIncludeSymbols={setIncludeSymbols}
+                            />
+                        </Box>
+                    </Grid>
+                </Grid>
             </Box>
 
             <Box

@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
-import { Container, Box } from '@mui/material';
+import { Container, Box, Alert, Snackbar } from '@mui/material';
 import { useRouter } from 'next/router';
-import CustomTitle from 'components/CustomTitle';
-import CustomTextField from 'components/CustomTextField';
-import CustomButton from 'components/CustomButton';
-import CustomLink from 'components/CustomLink';
+import CustomTitle from '../components/CustomTitle';
+import CustomTextField from '../components/CustomTextField';
+import PasswordField from '../components/PasswordField';
+import CustomButton from '../components/CustomButton';
+import CustomLink from '../components/CustomLink';
 
 export default function Register() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const router = useRouter();
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            setLoading(true);
             const res = await fetch('/api/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -25,56 +30,90 @@ export default function Register() {
                 localStorage.setItem('token', data.token);
                 router.push('/passwords');
             } else {
-                alert('Registration failed');
+                setError('Registration failed');
             }
         } catch (error) {
             console.error('Registration error:', error);
+            setError('An error occurred');
+        } finally {
+            setLoading(false);
         }
     };
 
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    };
+
     return (
-        <Container maxWidth="sm" sx={{ mt: 12 }}>
-            <Box sx={{ mt: 4 }}>
+        <Container maxWidth="sm">
+            <Box sx={{ mt: 8, mb: 4 }}>
                 <CustomTitle>
                     Register
                 </CustomTitle>
-                <form onSubmit={handleRegister}>
+
+                {error && (
+                    <Alert
+                        severity="error"
+                        sx={{ mb: 2, borderRadius: '8px' }}
+                        onClose={() => setError('')}
+                    >
+                        {error}
+                    </Alert>
+                )}
+
+                <Box component="form" onSubmit={handleRegister} sx={{ mt: 4 }}>
                     <CustomTextField
-                        sx={{ mb: 3 }}
                         label="Username"
-                        variant="outlined"
-                        fullWidth
-                        size="medium"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
+                        fullWidth
                         required
+                        sx={{ mb: 2 }}
+                        disabled={loading}
                     />
 
-                    <CustomTextField
-                        sx={{ mb: 3 }}
+                    <PasswordField
                         label="Password"
-                        type="password"
-                        fullWidth
-                        size="medium"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        fullWidth
                         required
+                        sx={{ mb: 4 }}
+                        disabled={loading}
                     />
 
                     <CustomButton
                         type="submit"
                         fullWidth
-                        size="large"
+                        disabled={loading}
                     >
-                        Register
+                        {loading ? 'Registering...' : 'Register'}
                     </CustomButton>
-                </form>
-                <Box sx={{ mt: 1, textAlign: 'center' }}>
-                    <CustomLink href="/login">
+
+                    <CustomLink href="/login" sx={{ mt: 2, display: 'block', textAlign: 'center' }}>
                         Already have an account? Login
                     </CustomLink>
                 </Box>
             </Box>
+
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={2000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={handleCloseSnackbar}
+                    severity="success"
+                    sx={{
+                        width: '100%',
+                        fontFamily: 'var(--font-tomorrow)',
+                        borderRadius: '8px'
+                    }}
+                >
+                    Registration successful! Redirecting...
+                </Alert>
+            </Snackbar>
         </Container>
     );
 } 
