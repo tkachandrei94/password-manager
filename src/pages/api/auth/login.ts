@@ -1,44 +1,46 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import mongoose from 'mongoose';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-    throw new Error('Please define MONGODB_URI environment variable');
-}
-
-const UserSchema = new mongoose.Schema({
-    username: String,
-    password: String,
-    isAdmin: { type: Boolean, default: false }
-});
-
-const User = mongoose.models.User || mongoose.model('User', UserSchema);
+import bcrypt from 'bcryptjs';
+import dbConnect from '../../../lib/dbConnect';
+import User from '../../../models/User';
+import { generateToken } from '../../../utils/auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {
         return res.status(405).end();
     }
 
-    const { username, password } = req.body;
-    console.log("username:", username);
-    console.log("password:", password);
     try {
-        const user = await User.findOne({ username, password });
-        console.log("user:", user);
+        await dbConnect();
+        
+        const { username, password } = req.body;
+        console.log("Спроба входу для користувача:", username);
+
+        // Знаходимо користувача
+        const user = await User.findOne({ username });
+        
         if (!user) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            console.log("Користувача не знайдено");
+            return res.status(401).json({ message: 'Невірний логін або пароль' });
         }
 
-        const token = jwt.sign({ 
-            userId: user._id,
-            isAdmin: user.isAdmin 
-        }, JWT_SECRET, { expiresIn: '24h' });
+        // Перевіряємо пароль
+        const isValidPassword = await bcrypt.compare(password, user.password);
+        
+        if (!isValidPassword) {
+            console.log("Невірний пароль");
+            return res.status(401).json({ message: 'Невірний логін або пароль' });
+        }
 
+        // Генеруємо токен
+        const token = generateToken({ 
+            userId: user._id.toString(),
+            isAdmin: user.isAdmin 
+        });
+
+        console.log("Успішний вхід для користувача:", username);
         return res.status(200).json({ token });
     } catch (error) {
-        return res.status(500).json({ message: 'Login error' });
+        console.error("Помилка входу:", error);
+        return res.status(500).json({ message: 'Помилка входу в систему' });
     }
 } 
