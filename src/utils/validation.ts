@@ -10,5 +10,5 @@ export const validateUsername = (username: string): boolean => {
 
 export const validatePassword = (password: string): boolean => {
     if (!password) return false;
-    return password.length >= 6;
+    return password.length >= 3;
 }; 
