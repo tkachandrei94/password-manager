@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 
 declare global {
-    var mongoose: { conn: null | typeof mongoose; promise: null | Promise<typeof mongoose> };
+    var mongoose: { conn: null | typeof mongoose; promise: null | Promise<typeof mongoose> } | undefined;
 }
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
