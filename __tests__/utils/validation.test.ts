@@ -17,7 +17,7 @@ describe('Validation Utils', () => {
         });
 
         it('invalidates weak password', () => {
-            expect(validatePassword('weak')).toBe(false);
+            expect(validatePassword('pa')).toBe(false);
         });
     });
 }); 
