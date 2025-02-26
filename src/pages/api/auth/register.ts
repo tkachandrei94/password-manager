@@ -1,86 +1,68 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import mongoose from 'mongoose';
-import jwt from 'jsonwebtoken';
-
-declare global {
-    var mongoose: { conn: null | typeof mongoose; promise: null | Promise<typeof mongoose> };
-}
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://mongo_pass-manager:27017/praktika';
-
-if (!MONGODB_URI) {
-    throw new Error('Please define MONGODB_URI environment variable');
-}
-
-mongoose.set('strictQuery', false);
-
-let cached = global.mongoose;
-
-if (!cached) {
-    cached = global.mongoose = { conn: null, promise: null };
-}
-
-async function dbConnect() {
-    console.log('Attempting to connect to MongoDB...');
-    
-    try {
-        // Перевірка існуючого підключення
-        if (mongoose.connections[0].readyState) {
-            console.log('Using existing MongoDB connection');
-            return mongoose.connections[0];
-        }
-        
-        console.log(`Connecting to MongoDB...`);
-        
-        // Підключення до бази даних
-        await mongoose.connect(MONGODB_URI);
-        
-        console.log('Successfully connected to MongoDB');
-        return mongoose.connections[0];
-    } catch (error: any) {
-        console.error('MongoDB connection error:', error);
-        throw new Error(`Failed to connect to database: ${error.message}`);
-    }
-}
-
-const UserSchema = new mongoose.Schema({
-    username: String,
-    password: String,
-    isAdmin: { type: Boolean, default: false }
-});
-
-const User = mongoose.models.User || mongoose.model('User', UserSchema);
-
+import bcrypt from 'bcryptjs';
+import dbConnect from '../../../lib/dbConnect';
+import { validatePassword, validateUsername } from '../../../utils/validation';
+import User from 'models/User';
+import { generateToken } from '../../../utils/auth';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {
-        return res.status(405).end();
+        return res.status(405).json({ message: 'Method not allowed' });
     }
 
     try {
+        console.log('Підключення до бази даних...');
         await dbConnect();
-        
+        console.log('Підключено до бази даних');
+
         const { username, password } = req.body;
-        const existingUser = await User.findOne({ username });
-        
-        if (existingUser) {
-            return res.status(400).json({ message: 'Username already exists' });
+        console.log('Отримано запит на реєстрацію для користувача:', username);
+
+        // Валідація даних
+        if (!validateUsername(username) || !validatePassword(password)) {
+            console.log('Помилка валідації:', { 
+                usernameValid: validateUsername(username), 
+                passwordValid: validatePassword(password) 
+            });
+            return res.status(400).json({ 
+                message: 'Невірне ім\'я користувача або пароль',
+                details: {
+                    username: validateUsername(username) ? 'вірний' : 'невірний',
+                    password: validatePassword(password) ? 'вірний' : 'невірний'
+                }
+            });
         }
 
-        const user = await User.create({ 
-            username, 
-            password,
-            isAdmin: false
+        // Перевірка існування користувача
+        const existingUser = await User.findOne({ username });
+        if (existingUser) {
+            console.log('Користувач вже існує:', username);
+            return res.status(400).json({ message: 'Користувач вже існує' });
+        }
+
+        // Хешування пароля
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Створення користувача
+        const user = await User.create({
+            username,
+            password: hashedPassword
         });
 
-        const token = jwt.sign({ 
-            userId: user._id,
-            isAdmin: user.isAdmin 
-        }, JWT_SECRET, { expiresIn: '24h' });
+        // Генерація токена
+        const token = generateToken({ userId: user._id.toString() });
 
-        return res.status(200).json({ token });
-    } catch (error) {
-        console.error('Registration error:', error);
-        return res.status(500).json({ message: 'Error creating user' });
+        console.log('Користувача успішно створено:', username);
+        return res.status(201).json({ 
+            message: 'Користувача успішно створено',
+            token 
+        });
+    } catch (error: any) {
+        console.error('Помилка реєстрації:', error);
+        return res.status(500).json({ 
+            message: 'Помилка створення користувача',
+            error: process.env.NODE_ENV === 'development' ? 
+                error?.message || 'Невідома помилка' : 
+                undefined
+        });
     }
 } 

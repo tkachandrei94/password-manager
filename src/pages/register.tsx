@@ -25,16 +25,18 @@ export default function Register() {
         body: JSON.stringify({ username, password }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        const data = await res.json();
         localStorage.setItem('token', data.token);
+        setOpenSnackbar(true);
         router.push('/passwords');
       } else {
-        setError('Registration failed');
+        setError(data.message || 'Помилка реєстрації');
       }
     } catch (error) {
-      console.error('Registration error:', error);
-      setError('An error occurred');
+      console.error('Помилка реєстрації:', error);
+      setError('Виникла помилка');
     } finally {
       setLoading(false);
     }

@@ -1,23 +1,26 @@
-# Use the official Node.js image as a base
-FROM node:18
+# Базовый образ
+FROM node:18-alpine
 
-# Set the working directory
+# Рабочая директория
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Копируем package.json и package-lock.json
 COPY package*.json ./
 
-# Install dependencies
+# Устанавливаем зависимости
 RUN npm install
 
-# Copy the rest of the application code
+# Копируем исходный код
 COPY . .
 
-# Build the Next.js application
+# Проверяем типы
+RUN npm run lint
+
+# Собираем приложение
 RUN npm run build
 
-# Expose the port the app runs on
+# Открываем порт
 EXPOSE 3000
 
-# Start the application
+# Запускаем приложение
 CMD ["npm", "start"]

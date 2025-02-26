@@ -1,55 +1,60 @@
 import { createMocks } from 'node-mocks-http';
-import type { NextApiRequest, NextApiResponse } from 'next';
+import handler from '../../../src/pages/api/auth/register';
+import User from '../../../src/models/User';
 
-// Мокируем mongoose и его методы
-jest.mock('mongoose', () => ({
-    connect: jest.fn().mockResolvedValue(true),
-    Schema: jest.fn(),
-    model: jest.fn(),
-    models: {
-        User: {
-            findOne: jest.fn().mockResolvedValue(null),
-            create: jest.fn().mockResolvedValue({ _id: 'test-id' })
-        }
-    },
-    set: jest.fn(),
-    connections: [{ readyState: 1 }]
-}));
-
-// Мокируем bcrypt
-jest.mock('bcryptjs', () => ({
-    hash: jest.fn().mockResolvedValue('hashed_password'),
-    compare: jest.fn().mockResolvedValue(true)
-}));
-
-// Мокируем валидацию
-jest.mock('../../../src/utils/validation', () => ({
-    validatePassword: jest.fn().mockReturnValue(false),
-    validateUsername: jest.fn().mockReturnValue(false)
-}));
+jest.mock('../../../src/models/User');
+jest.mock('../../../src/lib/dbConnect', () => jest.fn());
 
 describe('Register API', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
     it('returns 405 for non-POST requests', async () => {
-        const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+        const { req, res } = createMocks({
             method: 'GET',
         });
 
-        const handler = require('../../../src/pages/api/auth/register').default;
         await handler(req, res);
+
         expect(res._getStatusCode()).toBe(405);
+        expect(JSON.parse(res._getData())).toEqual({
+            message: 'Method not allowed',
+        });
     });
 
-    it('returns 200', async () => {
-        const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
+    it('returns 201 for successful registration', async () => {
+        const { req, res } = createMocks({
             method: 'POST',
             body: {
-                username: 'test',
-                password: 'weak'
+                username: 'testuser',
+                password: 'password123',
             },
         });
 
-        const handler = require('../../../src/pages/api/auth/register').default;
         await handler(req, res);
-        expect(res._getStatusCode()).toBe(200);
+
+        expect(res._getStatusCode()).toBe(201);
+        expect(JSON.parse(res._getData())).toMatchObject({
+            message: 'Користувача успішно створено',
+            token: expect.any(String),
+        });
+    });
+
+    it('returns 400 for invalid input', async () => {
+        const { req, res } = createMocks({
+            method: 'POST',
+            body: {
+                username: 'te',  // слишком короткое имя
+                password: '123', // слишком короткий пароль
+            },
+        });
+
+        await handler(req, res);
+
+        expect(res._getStatusCode()).toBe(400);
+        expect(JSON.parse(res._getData())).toMatchObject({
+            message: 'Невірне ім\'я користувача або пароль',
+        });
     });
 }); 
