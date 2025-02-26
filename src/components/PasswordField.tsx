@@ -39,7 +39,7 @@ const PasswordField: React.FC<PasswordFieldProps> = (props) => {
                             edge="end"
                             sx={{
                                 color: '#BD787D',
-                                marginRight: '8px'
+                                marginLeft: '8px'
                             }}
                         >
                             {showPassword ? <VisibilityOff /> : <Visibility />}
