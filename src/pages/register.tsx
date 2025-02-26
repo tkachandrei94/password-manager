@@ -19,6 +19,8 @@ export default function Register() {
     e.preventDefault();
     try {
       setLoading(true);
+      setError('');
+
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -28,9 +30,14 @@ export default function Register() {
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem('token', data.token);
-        setOpenSnackbar(true);
-        router.push('/passwords');
+        try {
+          localStorage.setItem('token', data.token);
+          setOpenSnackbar(true);
+          router.push('/passwords');
+        } catch (storageError) {
+          console.error('Помилка збереження токена:', storageError);
+          setError('Помилка авторизації');
+        }
       } else {
         setError(data.message || 'Помилка реєстрації');
       }

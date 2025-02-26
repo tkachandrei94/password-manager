@@ -17,10 +17,10 @@ export default function Login() {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
-        setLoading(true);
-
         try {
+            setLoading(true);
+            setError('');
+
             const res = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -30,17 +30,19 @@ export default function Login() {
             const data = await res.json();
 
             if (res.ok) {
-                localStorage.setItem('token', data.token);
-                setOpenSnackbar(true);
-                setTimeout(() => {
+                try {
+                    localStorage.setItem('token', data.token);
                     router.push('/passwords');
-                }, 1500);
+                } catch (storageError) {
+                    console.error('Помилка збереження токена:', storageError);
+                    setError('Помилка авторизації');
+                }
             } else {
-                setError(data.message || 'Invalid username or password');
+                setError(data.message || 'Невірний логін або пароль');
             }
         } catch (error) {
-            console.error('Login error:', error);
-            setError('Network error. Please try again.');
+            console.error('Помилка входу:', error);
+            setError('Виникла помилка');
         } finally {
             setLoading(false);
         }
