@@ -23,7 +23,7 @@ jobs:
         
       - name: Run tests
         env:
-          MONGODB_URI: mongodb://localhost:27017/test-db
+          MONGODB_URI: mongodb+srv://andrewtkach1994:%3BtAJ2ayigz_%21*9%23@password-manager-cluste.hbszn.mongodb.net/password-manager-test?retryWrites=true&w=majority
           JWT_SECRET: test-secret-key
           NODE_ENV: test
         run: npm test
