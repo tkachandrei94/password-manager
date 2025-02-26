@@ -1,23 +1,27 @@
 version: '3.8'
 
 services:
-  web:
+  app:
     build: .
     ports:
       - "3000:3000"
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/praktika
-    depends_on:
-      - mongo_pass-manager
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongodb:27017/password-manager
+      - JWT_SECRET=${JWT_SECRET}
     volumes:
       - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - mongodb
 
-  mongo_pass-manager:
+  mongodb:
     image: mongo:latest
     ports:
-      - "27017:27017"
+      - "27018:27017"  # Внешний порт 27018 для избежания конфликтов
     volumes:
-      - mongo-data:/data/db
+      - mongodb_data:/data/db
 
 volumes:
-  mongo-data:
+  mongodb_data:
