@@ -12,12 +12,12 @@ export default function Home() {
 
     return (
         <Container>
-            <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    minHeight: '100vh'
+            <Box 
+                sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    minHeight: '100vh' 
                 }}
             >
                 <CircularProgress />
