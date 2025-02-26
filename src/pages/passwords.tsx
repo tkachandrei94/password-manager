@@ -288,8 +288,10 @@ export default function Passwords() {
                 sx={{
                     position: 'fixed',
                     bottom: 0,
-                    right: 44,
-                    zIndex: -1
+                    right: { xs: 16, sm: 44 },
+                    zIndex: -1,
+                    width: { xs: '150px', sm: '350px', md: '706px' },
+                    height: { xs: '74px', sm: '174px', md: '348px' }
                 }}
             >
                 <Image
@@ -297,6 +299,10 @@ export default function Passwords() {
                     alt="Decorative image"
                     width={706}
                     height={348}
+                    style={{
+                        width: '100%',
+                        height: 'auto'
+                    }}
                 />
             </Box>
         </Container>

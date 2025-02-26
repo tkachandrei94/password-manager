@@ -13,10 +13,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await dbConnect();
         
         const { username, password } = req.body;
-        console.log("Спроба входу для користувача:", username);
+        const normalizedUsername = username.toLowerCase(); // Приводим к нижнему регистру
+        console.log("Спроба входу для користувача:", normalizedUsername);
 
         // Знаходимо користувача
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ 
+            username: { $regex: new RegExp(`^${normalizedUsername}$`, 'i') } 
+        });
         
         if (!user) {
             console.log("Користувача не знайдено");
@@ -37,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             isAdmin: user.isAdmin 
         });
 
-        console.log("Успішний вхід для користувача:", username);
+        console.log("Успішний вхід для користувача:", normalizedUsername);
         return res.status(200).json({ token });
     } catch (error) {
         console.error("Помилка входу:", error);
