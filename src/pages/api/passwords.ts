@@ -3,14 +3,14 @@ import mongoose from 'mongoose';
 import dbConnect from '../../lib/dbConnect';
 import { verifyToken } from 'utils/auth';
 
-// Определяем интерфейс для пароля
+// Визначаємо інтерфейс для пароля
 interface IPassword {
     userId: string;
     title: string;
     password: string;
 }
 
-// Определяем схему для пароля
+// Визначаємо схему для пароля
 const PasswordSchema = new mongoose.Schema<IPassword>({
     userId: {
         type: String,
@@ -28,7 +28,7 @@ const PasswordSchema = new mongoose.Schema<IPassword>({
     timestamps: true
 });
 
-// Создаем или получаем модель
+// Створюємо або отримуємо модель
 const Password = mongoose.models.Password || mongoose.model<IPassword>('Password', PasswordSchema);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

@@ -1,32 +1,32 @@
 import mongoose from 'mongoose';
 
-// Определяем интерфейс для пользователя
+// Визначаємо інтерфейс для користувача
 export interface IUser {
     username: string;
     password: string;
     isAdmin?: boolean;
 }
 
-// Определяем схему для пользователя
+// Визначаємо схему для користувача
 const UserSchema = new mongoose.Schema<IUser>({
     username: {
         type: String,
-        required: [true, 'Please provide a username'],
+        required: [true, 'Будь ласка, вкажіть ім\'я користувача'],
         unique: true,
-        minlength: [3, 'Username must be at least 3 characters long']
+        minlength: [3, 'Ім\'я користувача має бути не менше 3 символів']
     },
     password: {
         type: String,
-        required: [true, 'Please provide a password'],
-        minlength: [6, 'Password must be at least 6 characters long']
+        required: [true, 'Будь ласка, вкажіть пароль'],
+        minlength: [3, 'Пароль має бути не менше 3 символів']
     },
     isAdmin: {
         type: Boolean,
         default: false
     }
 }, {
-    timestamps: true // Добавляет поля createdAt и updatedAt
+    timestamps: true // Додає поля createdAt та updatedAt
 });
 
-// Проверяем, не зарегистрирована ли уже модель
+// Перевіряємо, чи не зареєстрована вже модель
 export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema); 

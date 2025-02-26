@@ -11,13 +11,6 @@ const customJestConfig = {
     moduleNameMapper: {
         '^models/(.*)$': '<rootDir>/src/models/$1',
     },
-    testEnvironmentOptions: {
-        env: {
-            MONGODB_URI: 'mongodb://localhost:27017/test-db',
-            JWT_SECRET: 'test-secret-key',
-            NODE_ENV: 'test'
-        }
-    }
 };
 
 module.exports = createJestConfig(customJestConfig); 

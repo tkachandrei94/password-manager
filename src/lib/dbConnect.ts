@@ -6,12 +6,13 @@ if (!process.env.MONGODB_URI) {
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-// Определяем типы
+// Визначаємо типи
 type GlobalMongoose = {
     conn: typeof mongoose | null;
     promise: Promise<typeof mongoose> | null;
 };
 
+// Глобальний тип для mongoose
 declare global {
     var mongoose: GlobalMongoose | undefined;
 }

@@ -15,10 +15,11 @@ A secure password manager application built with Next.js, Material-UI, and Mongo
 
 1. Clone the repository
 2. Install dependencies
-3. Create a `.env` file in the root directory with the following variables:
-   - `MONGODB_URI`: Your MongoDB connection string
+3. Create MongoDB Atlas account and get connection string
+4. Create `.env.local` file with the following variables:
+   - `MONGODB_URI`: Your MongoDB Atlas connection string
    - `JWT_SECRET`: A secret key for JWT authentication
-4. Start the development server
+5. Start the development server
 
 ## Деплой на Render
 
@@ -78,8 +79,7 @@ contributors:
 1. Створіть обліковий запис на [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
 2. Створіть новий кластер
 3. У налаштуваннях мережі (Network Access):
-   - Додайте ваш IP адрес
-   - Або дозвольте доступ з будь-якого IP (0.0.0.0/0)
+   - Додайте IP адресу Render (0.0.0.0/0 для тестування)
 4. У налаштуваннях бази даних (Database Access):
    - Створіть нового користувача
    - Запам'ятайте username та password
@@ -87,10 +87,16 @@ contributors:
    - Натисніть "Connect" на кластері
    - Виберіть "Connect your application"
    - Скопіюйте URI
-6. Створіть файл .env.local та додайте:
-   ```env
-   MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/password-manager?retryWrites=true&w=majority
-   JWT_SECRET=your-secret-key
+6. Додайте URI в змінні оточення на Render:
    ```
+   MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/password-manager?retryWrites=true&w=majority
+   ```
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
 
 
