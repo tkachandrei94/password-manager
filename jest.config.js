@@ -5,12 +5,18 @@ const createJestConfig = nextJest({
 });
 
 const customJestConfig = {
-    setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+    moduleDirectories: ['node_modules', '<rootDir>/'],
     testEnvironment: 'jest-environment-jsdom',
-    moduleDirectories: ['node_modules', '<rootDir>'],
-    testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
+    setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
     moduleNameMapper: {
-        '^@/(.*)$': '<rootDir>/src/$1'
+        '^models/(.*)$': '<rootDir>/src/models/$1',
+    },
+    testEnvironmentOptions: {
+        env: {
+            MONGODB_URI: 'mongodb://localhost:27017/test-db',
+            JWT_SECRET: 'test-secret-key',
+            NODE_ENV: 'test'
+        }
     }
 };
 

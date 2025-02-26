@@ -4,7 +4,6 @@ import dbConnect from '../../../lib/dbConnect';
 import { validatePassword, validateUsername } from '../../../utils/validation';
 import User from 'models/User';
 import { generateToken } from '../../../utils/auth';
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {
         return res.status(405).json({ message: 'Method not allowed' });
