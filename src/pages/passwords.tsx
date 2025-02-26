@@ -24,6 +24,7 @@ export default function Passwords() {
     });
     const [visiblePasswords, setVisiblePasswords] = useState<{ [key: string]: boolean }>({});
     const [showPassword, setShowPassword] = useState(false);
+    const [isAuthorized, setIsAuthorized] = useState(false);
 
     // Стан для генератора паролів
     const [passwordLength, setPasswordLength] = useState(12);
@@ -33,20 +34,30 @@ export default function Passwords() {
     const [includeSymbols, setIncludeSymbols] = useState(false);
 
     useEffect(() => {
-        // Перевірка авторизації при завантаженні сторінки
-        const token = localStorage.getItem('token');
-        if (!token) {
-            console.log('No token found, redirecting to login');
-            router.push('/login');
-            return;
-        }
+        const checkAuth = () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    router.push('/login');
+                    return;
+                }
+                setIsAuthorized(true);
+            } catch (error) {
+                console.error('Помилка перевірки авторизації:', error);
+                router.push('/login');
+            }
+        };
 
+        checkAuth();
+    }, [router]);
+
+    useEffect(() => {
         // Перевірка валідності токена
         const checkAuth = async () => {
             try {
                 const res = await fetch('/api/auth/verify', {
                     headers: {
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
@@ -189,6 +200,8 @@ export default function Passwords() {
             password: e.target.value
         });
     };
+
+    if (!isAuthorized) return null;
 
     return (
         <Container maxWidth="lg">
