@@ -4,8 +4,9 @@ import {
   Slider,
   Typography,
   FormControlLabel,
-  Checkbox,
-  Paper
+  Paper,
+  Grid,
+  Checkbox
 } from '@mui/material';
 import CustomButton from './CustomButton';
 
@@ -47,17 +48,32 @@ const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
             valueLabelFormat={(value) => `${value}`}
             sx={{
               color: '#BD787D',
+              '& .MuiSlider-rail': {
+                backgroundColor: '#BD787D',
+              },
+              '& .MuiSlider-track': {
+                backgroundColor: '#BD787D',
+                border: 'none',
+              },
               '& .MuiSlider-thumb': {
-                '&:hover, &.Mui-focusVisible': {
-                  boxShadow: '0px 0px 0px 8px rgba(189, 120, 125, 0.16)',
+                color: '#E0ACBE',
+                '&::before': {
+                  boxShadow: 'none',
+                },
+                '&::after': {
+                  display: 'none',
                 },
               },
               '& .MuiSlider-valueLabel': {
-                backgroundColor: '#BD787D',
+                backgroundColor: '#833D3B',
                 fontFamily: 'var(--font-tomorrow)',
                 fontSize: '14px',
-                padding: '2px 6px',
-                borderRadius: '4px',
+                padding: '0px 12px',
+                borderRadius: '0',
+                '&::before': {
+                  display: 'none',
+                },
+                color: '#8F8483',
               },
             }}
           />
@@ -65,102 +81,100 @@ const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
       </Box>
 
       <Box sx={{ mb: 3 }}>
-        <Typography
-          sx={{
-            mb: 1,
-            fontFamily: 'var(--font-tomorrow)',
-            color: '#833D3B'
-          }}
-        >
-          Include:
-        </Typography>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={includeLowercase}
-              onChange={(e) => setIncludeLowercase(e.target.checked)}
+        <Grid container spacing={0}>
+          <Grid item xs={6}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={includeLowercase}
+                  onChange={(e) => setIncludeLowercase(e.target.checked)}
+                  sx={{
+                    color: '#BD787D',
+                    '&.Mui-checked': {
+                      color: '#BD787D',
+                    },
+                  }}
+                />
+              }
+              label="Lowercase letters"
               sx={{
-                color: '#BD787D',
-                '&.Mui-checked': {
-                  color: '#BD787D',
-                },
+                '& .MuiFormControlLabel-label': {
+                  fontFamily: 'var(--font-tomorrow)',
+                  color: '#833D3B'
+                }
               }}
             />
-          }
-          label="Lowercase letters (a-z)"
-          sx={{
-            '& .MuiFormControlLabel-label': {
-              fontFamily: 'var(--font-tomorrow)',
-              color: '#833D3B'
-            }
-          }}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={includeUppercase}
-              onChange={(e) => setIncludeUppercase(e.target.checked)}
+          </Grid>
+          <Grid item xs={6}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={includeUppercase}
+                  onChange={(e) => setIncludeUppercase(e.target.checked)}
+                  sx={{
+                    color: '#BD787D',
+                    '&.Mui-checked': {
+                      color: '#BD787D',
+                    },
+                  }}
+                />
+              }
+              label="Uppercase letters"
               sx={{
-                color: '#BD787D',
-                '&.Mui-checked': {
-                  color: '#BD787D',
-                },
+                '& .MuiFormControlLabel-label': {
+                  fontFamily: 'var(--font-tomorrow)',
+                  color: '#833D3B'
+                }
               }}
             />
-          }
-          label="Uppercase letters (A-Z)"
-          sx={{
-            '& .MuiFormControlLabel-label': {
-              fontFamily: 'var(--font-tomorrow)',
-              color: '#833D3B'
-            }
-          }}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={includeNumbers}
-              onChange={(e) => setIncludeNumbers(e.target.checked)}
+          </Grid>
+          <Grid item xs={6}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={includeNumbers}
+                  onChange={(e) => setIncludeNumbers(e.target.checked)}
+                  sx={{
+                    color: '#BD787D',
+                    '&.Mui-checked': {
+                      color: '#BD787D',
+                    },
+                  }}
                 />
               }
               label="Numbers"
               sx={{
-                color: '#BD787D',
-                '&.Mui-checked': {
-                  color: '#BD787D',
-                },
+                '& .MuiFormControlLabel-label': {
+                  fontFamily: 'var(--font-tomorrow)',
+                  color: '#833D3B'
+                }
               }}
             />
-          }
-          label="Numbers (0-9)"
-          sx={{
-            '& .MuiFormControlLabel-label': {
-              fontFamily: 'var(--font-tomorrow)',
-              color: '#833D3B'
-            }
-          }}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={includeSymbols}
-              onChange={(e) => setIncludeSymbols(e.target.checked)}
+          </Grid>
+          <Grid item xs={6}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={includeSymbols}
+                  onChange={(e) => setIncludeSymbols(e.target.checked)}
+                  sx={{
+                    color: '#BD787D',
+                    '&.Mui-checked': {
+                      color: '#BD787D',
+                    },
+                  }}
+                />
+              }
+              label="Symbols"
               sx={{
-                color: '#BD787D',
-                '&.Mui-checked': {
-                  color: '#BD787D',
-                },
+                '& .MuiFormControlLabel-label': {
+                  fontFamily: 'var(--font-tomorrow)',
+                  color: '#833D3B'
+                }
               }}
             />
-          }
-          label="Symbols (!@#$%^&*)"
-          sx={{
-            '& .MuiFormControlLabel-label': {
-              fontFamily: 'var(--font-tomorrow)',
-              color: '#833D3B'
-            }
-          }}
-        />
+          </Grid>
+        </Grid>
       </Box>
     </div>
   );

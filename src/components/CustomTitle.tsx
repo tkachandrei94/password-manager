@@ -7,6 +7,7 @@ const CustomTitle = styled(Typography)({
   fontWeight: 700,
   lineHeight: '40px',
   letterSpacing: '8px',
+  textTransform: 'uppercase',
 });
 
 export default CustomTitle; 

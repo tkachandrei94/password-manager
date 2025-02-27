@@ -54,7 +54,7 @@ export default function Login() {
 
     return (
         <Container maxWidth="sm">
-            <Box sx={{ mt: 8, mb: 4 }}>
+            <Box sx={{ mt: 18, mb: 4 }}>
                 <CustomTitle>
                     Login
                 </CustomTitle>

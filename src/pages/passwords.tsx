@@ -205,14 +205,16 @@ export default function Passwords() {
 
     return (
         <Container maxWidth="lg">
-            <Box sx={{ mt: 4, mb: 4 }}>
+            <Box sx={{ mt: 12.5, mb: 4 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                    <CustomTitle>
+                    <CustomTitle
+                    >
                         Password Manager
                     </CustomTitle>
                     <CustomButton
                         onClick={handleLogout}
                         size="small"
+                        sx={{ p: '8px 20px', backgroundColor: 'unset', border: '2px solid #BD787D', color: '#BD787D', fontWeight: 400 }}
                     >
                         Logout
                     </CustomButton>
@@ -254,19 +256,6 @@ export default function Passwords() {
                             borderRadius: '16px',
                             height: '100%'
                         }}>
-                            <Typography
-                                variant="h6"
-                                sx={{
-                                    mb: 3,
-                                    fontFamily: 'var(--font-tomorrow)',
-                                    color: '#833D3B',
-                                    letterSpacing: '2px',
-                                    fontWeight: 600
-                                }}
-                            >
-                                Password Generator
-                            </Typography>
-
                             <PasswordGenerator
                                 passwordLength={passwordLength}
                                 setPasswordLength={setPasswordLength}
@@ -305,6 +294,6 @@ export default function Passwords() {
                     }}
                 />
             </Box>
-        </Container>
+        </Container >
     );
 } 

@@ -1,7 +1,7 @@
 import { styled, Button } from '@mui/material';
 
 const CustomButton = styled(Button)({
-    borderRadius: '50px',
+    borderRadius: '50vh',
     background: '#833D3B',
     color: '#8F8483',
     fontFamily: 'var(--font-tomorrow)',
@@ -9,10 +9,10 @@ const CustomButton = styled(Button)({
     fontWeight: 600,
     lineHeight: '24px',
     letterSpacing: '3.2px',
-    padding: '10px 30px',
-    textTransform: 'none', // щоб текст не був у верхньому регістрі
+    padding: '18px 30px',
+    textTransform: 'uppercase',
     '&:hover': {
-        background: '#6D3230', // трохи темніший при наведенні
+        background: '#6D3230',
     },
     '&:disabled': {
         background: '#B38D8C',
