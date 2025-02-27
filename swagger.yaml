@@ -1,0 +1,163 @@
+openapi: 3.0.0
+info:
+  title: Password Manager API
+  description: API для керування паролями та автентифікації користувачів
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Локальний сервер
+paths:
+  /api/auth/register:
+    post:
+      summary: Реєстрація нового користувача
+      description: Реєстрація нового користувача з ім'ям та паролем
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: testuser
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '200':
+          description: Успішна реєстрація
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: Помилка валідації
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Невірне ім'я користувача або пароль
+
+  /api/auth/login:
+    post:
+      summary: Вхід користувача
+      description: Автентифікація користувача за допомогою імені та пароля
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: testuser
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '200':
+          description: Успішний вхід
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Невірне ім'я користувача або пароль
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Невірне ім'я користувача або пароль
+
+  /api/passwords:
+    get:
+      summary: Отримати список паролів
+      description: Повертає список паролів для автентифікованого користувача
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Успішне отримання паролів
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      example: Gmail
+                    password:
+                      type: string
+                      example: mypassword123
+        '401':
+          description: Неавтентифікований користувач
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Необхідна автентифікація
+    post:
+      summary: Додати новий пароль
+      description: Додає новий пароль для автентифікованого користувача
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Gmail
+                password:
+                  type: string
+                  example: mypassword123
+      responses:
+        '201':
+          description: Пароль успішно додано
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Пароль успішно додано
+        '401':
+          description: Неавтентифікований користувач
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Необхідна автентифікація
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT 
