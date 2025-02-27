@@ -121,6 +121,9 @@ const PasswordGenerator: React.FC<PasswordGeneratorProps> = ({
             <Checkbox
               checked={includeNumbers}
               onChange={(e) => setIncludeNumbers(e.target.checked)}
+                />
+              }
+              label="Numbers"
               sx={{
                 color: '#BD787D',
                 '&.Mui-checked': {
